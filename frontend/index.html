@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>3D Maze Solver</title>
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+    <script defer src="app.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <meta name="color-scheme" content="dark light">
+</head>
+<body>
+    <header class="topbar">
+        <h1>3D Maze Solver</h1>
+        <div class="controls">
+            <label>Rows <input id="rows" type="number" min="5" max="100" value="20"></label>
+            <label>Cols <input id="cols" type="number" min="5" max="100" value="20"></label>
+            <label>Wall % <input id="wallProb" type="number" min="0" max="0.9" step="0.05" value="0.3"></label>
+            <label>Algorithm
+                <select id="algorithm">
+                    <option value="bfs" selected>BFS (Shortest)</option>
+                    <option value="dfs">DFS</option>
+                    <option value="astar">A*</option>
+                </select>
+            </label>
+            <button id="btnGenerate">Random Maze</button>
+            <button id="btnEdit">User Input Mode</button>
+            <button id="btnSolve" class="primary">Solve</button>
+        </div>
+    </header>
+
+    <main class="layout">
+        <section class="panel left">
+            <div class="hint">Editor: Click to toggle wall. Shift+Click: Start. Alt+Click: End.</div>
+            <canvas id="editor" width="600" height="600"></canvas>
+            <div class="legend">
+                <span class="chip wall"></span> Wall
+                <span class="chip start"></span> Start
+                <span class="chip end"></span> End
+                <span class="chip path"></span> Path
+            </div>
+            <div id="status"></div>
+        </section>
+        <section class="panel right">
+            <div id="threeContainer"></div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <span id="steps">Steps: -</span>
+        <span id="message"></span>
+    </footer>
+</body>
+</html>
+
