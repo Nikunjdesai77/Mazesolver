@@ -52,8 +52,8 @@
         if (grid[i][j] === 1) {
           ctx.fillStyle = '#2b335f';
           ctx.fillRect(j * cell, i * cell, cell, cell);
-          ctx.strokeStyle = '#3a478f';
-          ctx.strokeRect(j * cell + 0.5, i * cell + 0.5, cell - 1, cell - 1);
+      ctx.strokeStyle = 'rgba(110, 231, 249, 0.5)';
+      ctx.strokeRect(j * cell + 0.5, i * cell + 0.5, cell - 1, cell - 1);
         }
       }
     }
@@ -93,6 +93,18 @@
       ctx.lineTo(j * cell + 0.5, r * cell);
       ctx.stroke();
     }
+
+    // outer border around the maze area
+    const gridW = c * cell;
+    const gridH = r * cell;
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'rgba(59, 74, 161, 0.8)';
+    ctx.strokeRect(0.5, 0.5, gridW - 1, gridH - 1);
+
+    // subtle inner highlight on the black portion to better delineate walls area
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(110, 231, 249, 0.25)';
+    ctx.strokeRect(1.5, 1.5, gridW - 3, gridH - 3);
   }
 
   editor.addEventListener('click', (e) => {
@@ -122,7 +134,7 @@
   }
 
   // Three.js 3D View
-  let renderer, scene, camera, wallsGroup, pathLine;
+  let renderer, scene, camera, wallsGroup, edgesGroup, boundaryGroup, pathLine;
   function setupThree() {
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -151,14 +163,20 @@
     scene.add(floor);
 
     wallsGroup = new THREE.Group();
+    edgesGroup = new THREE.Group();
+    boundaryGroup = new THREE.Group();
     scene.add(wallsGroup);
+    scene.add(edgesGroup);
+    scene.add(boundaryGroup);
 
     animate();
   }
 
   function updateThree(path = []) {
-    // clear walls
+    // clear walls, edges and boundary
     while (wallsGroup.children.length) wallsGroup.remove(wallsGroup.children[0]);
+    while (edgesGroup.children.length) edgesGroup.remove(edgesGroup.children[0]);
+    while (boundaryGroup.children.length) boundaryGroup.remove(boundaryGroup.children[0]);
     if (pathLine) { scene.remove(pathLine); pathLine.geometry.dispose(); }
 
     const r = grid.length, c = grid[0].length;
@@ -168,15 +186,39 @@
 
     const wallMat = new THREE.MeshStandardMaterial({ color: 0x2b335f });
     const wallGeo = new THREE.BoxGeometry(scale, scale, scale);
+    const edgeMat = new THREE.LineBasicMaterial({ color: 0x6ee7f9, transparent: true, opacity: 0.6, linewidth: 1 });
     for (let i = 0; i < r; i++) {
       for (let j = 0; j < c; j++) {
         if (grid[i][j] === 1) {
           const cube = new THREE.Mesh(wallGeo, wallMat);
           cube.position.set(offsetX + j * scale, scale / 2, offsetZ + i * scale);
           wallsGroup.add(cube);
+
+          // outline edges for visual border
+          const edges = new THREE.EdgesGeometry(wallGeo);
+          const line = new THREE.LineSegments(edges, edgeMat);
+          line.position.copy(cube.position);
+          edgesGroup.add(line);
         }
       }
     }
+
+    // perimeter frame (square outline) around the entire maze
+    const half = scale / 2;
+    const minX = offsetX - half;
+    const maxX = offsetX + (c - 1) * scale + half;
+    const minZ = offsetZ - half;
+    const maxZ = offsetZ + (r - 1) * scale + half;
+    const boundaryPts = [
+      new THREE.Vector3(minX, 0.02, minZ),
+      new THREE.Vector3(maxX, 0.02, minZ),
+      new THREE.Vector3(maxX, 0.02, maxZ),
+      new THREE.Vector3(minX, 0.02, maxZ)
+    ];
+    const boundaryGeo = new THREE.BufferGeometry().setFromPoints(boundaryPts);
+    const boundaryMat = new THREE.LineBasicMaterial({ color: 0x3b4aa1, transparent: true, opacity: 0.9 });
+    const boundary = new THREE.LineLoop(boundaryGeo, boundaryMat);
+    boundaryGroup.add(boundary);
 
     // start and end markers
     const startGeom = new THREE.ConeGeometry(scale * 0.35, scale * 0.8, 16);
