@@ -53,7 +53,7 @@ button.primary { background: linear-gradient(180deg, #1b2a75, #111a52); border-c
 .chip.path { background: #a78bfa; }
 
 #threeContainer { position: absolute; inset: 0; border-radius: 10px; overflow: hidden; border: 2px solid transparent; box-shadow: 0 0 0 3px rgba(59,74,161,0.15), 0 12px 30px rgba(0,0,0,0.4); background-clip: padding-box; }
-#threeContainer::before { content: ""; position: absolute; inset: -2px; border-radius: 12px; padding: 2px; background: linear-gradient(135deg, #6ee7f9, #a78bfa, #3b4aa1); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
+#threeContainer::before { content: ""; position: absolute; inset: -2px; border-radius: 12px; padding: 2px; background: linear-gradient(135deg, #6ee7f9, #a78bfa, #3b4aa1); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
 
 .footer { display: flex; gap: 12px; padding: 8px 16px; border-top: 1px solid #1f2547; color: var(--muted); background: #0f1220; }
 #status { font-size: 12px; color: var(--muted); }
